@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import heroOcean from "@/assets/hero-ocean.png.asset.json";
+import Countdown from "@/components/Countdown";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -40,11 +41,6 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const SUGGESTIONS = [
-  "Best view in London",
-  "Best room in New York",
-  "Best bath in Paris",
-];
 
 function MenuIcon() {
   return (
@@ -137,70 +133,12 @@ function Index() {
         </p>
       </div>
 
-      {/* Search area */}
+      {/* Countdown area */}
       <div
-        className="absolute left-1/2 z-20 -translate-x-1/2"
-        style={{ top: "63%", width: "70vw", maxWidth: "1120px" }}
+        className="absolute left-1/2 z-20 w-full -translate-x-1/2 px-6"
+        style={{ top: "64%", maxWidth: "900px" }}
       >
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Ask for the stay you actually want..."
-            className="w-full text-white outline-none transition-all focus:border-white"
-            style={{
-              height: "clamp(88px, 9vh, 96px)",
-              borderRadius: "999px",
-              border: "1.2px solid rgba(255,255,255,0.85)",
-              background: "rgba(5, 12, 18, 0.42)",
-              backdropFilter: "blur(4px)",
-              WebkitBackdropFilter: "blur(4px)",
-              paddingLeft: "64px",
-              paddingRight: "64px",
-              fontSize: "clamp(20px, 2vw, 29px)",
-              fontWeight: 300,
-              fontFamily: "'Poppins', sans-serif",
-            }}
-          />
-          <style>{`
-            input::placeholder {
-              color: rgba(255,255,255,0.78);
-              font-weight: 300;
-            }
-          `}</style>
-        </div>
-
-        {/* Suggestion chips */}
-        <div
-          className="grid grid-cols-1 sm:grid-cols-3"
-          style={{ marginTop: "15px", gap: "16px" }}
-        >
-          {SUGGESTIONS.map((s) => (
-            <button
-              key={s}
-              className="flex items-center justify-center text-white transition-colors"
-              style={{
-                height: "58px",
-                borderRadius: "999px",
-                background: "rgba(105, 120, 126, 0.62)",
-                fontSize: "clamp(16px, 1.4vw, 20px)",
-                fontWeight: 300,
-                color: "rgba(255,255,255,0.95)",
-                border: "none",
-                backdropFilter: "blur(2px)",
-                WebkitBackdropFilter: "blur(2px)",
-                fontFamily: "'Poppins', sans-serif",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(135, 150, 156, 0.72)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(105, 120, 126, 0.62)";
-              }}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
+        <Countdown />
       </div>
     </main>
   );
