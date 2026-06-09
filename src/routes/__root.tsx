@@ -87,8 +87,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Room Index" },
       { name: "twitter:description", content: "Hotel & Airbnb Room Rankings" },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/482ee6a8-b547-42c7-9132-ef7cf88132b4" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/482ee6a8-b547-42c7-9132-ef7cf88132b4" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/m593WUh7hnb2BMVgVqqWSdR23Za2/social-images/social-1781017814718-482ee6a8-b547-42c7-9132-ef7cf88132b4_(1).webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/m593WUh7hnb2BMVgVqqWSdR23Za2/social-images/social-1781017814718-482ee6a8-b547-42c7-9132-ef7cf88132b4_(1).webp" },
     ],
     links: [
       {
