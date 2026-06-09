@@ -94,17 +94,17 @@ function Index() {
         style={{ top: "22.5%" }}
       >
         <h1
-          className="text-white"
           style={{
-            fontFamily: "'Cormorant Garamond', 'Playfair Display', serif",
+            fontFamily: "'Qidea', 'Cormorant Garamond', 'Playfair Display', serif",
             fontWeight: 400,
             fontSize: "clamp(56px, 9vw, 112px)",
             lineHeight: 1.05,
             letterSpacing: "0.005em",
             marginTop: "10px",
+            color: "#ffffff",
           }}
         >
-          The Room <span className="text-rose-600">I</span>ndex
+          The Room <span style={{ color: "#e11d48" }}>Index</span>
         </h1>
         <p
           className="text-white"
