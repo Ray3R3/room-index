@@ -91,7 +91,7 @@ function Index() {
             color: "#ffffff",
           }}
         >
-          The Room <span style={{ color: "#e11d48" }}>I</span>ndex
+          The Room <span style={{ color: "#ffffff" }}>I</span>ndex
         </h1>
         <p
           className="text-white"
