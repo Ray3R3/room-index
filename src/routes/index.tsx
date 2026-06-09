@@ -136,7 +136,7 @@ function Index() {
       {/* Countdown area */}
       <div
         className="absolute left-1/2 z-20 w-full -translate-x-1/2 px-6"
-        style={{ top: "59%", maxWidth: "900px" }}
+        style={{ top: "64%", maxWidth: "900px" }}
       >
         <Countdown />
       </div>
