@@ -94,7 +94,7 @@ function Index() {
         style={{ top: "22.5%" }}
       >
         <p
-          className="text-white"
+          style={{ color: "#ff0000" }}
           style={{
             fontFamily: "'Poppins', sans-serif",
             fontWeight: 300,
