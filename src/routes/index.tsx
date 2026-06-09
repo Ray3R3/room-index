@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import heroOcean from "@/assets/hero-ocean.png.asset.json";
+import Countdown from "@/components/Countdown";
 
 export const Route = createFileRoute("/")({
   head: () => ({
