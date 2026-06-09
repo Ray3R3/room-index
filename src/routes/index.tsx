@@ -94,8 +94,8 @@ function Index() {
         style={{ top: "22.5%" }}
       >
         <p
-          style={{ color: "#ff0000" }}
           style={{
+            color: "#ff0000",
             fontFamily: "'Poppins', sans-serif",
             fontWeight: 300,
             fontSize: "clamp(20px, 2.4vw, 32px)",
@@ -119,8 +119,8 @@ function Index() {
           The Room <span style={{ color: "#ff0000" }}>I</span>ndex
         </h1>
         <p
-          className="text-white"
           style={{
+            color: "#ff0000",
             fontFamily: "'Poppins', sans-serif",
             fontWeight: 300,
             fontSize: "clamp(15px, 1.6vw, 24px)",
