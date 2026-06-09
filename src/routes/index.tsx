@@ -49,9 +49,9 @@ function MenuIcon() {
       className="fixed z-30 flex flex-col p-1 transition-opacity hover:opacity-100"
       style={{ top: "44px", left: "36px", gap: "7px", opacity: 0.85 }}
     >
-      <span className="block h-[2px] w-[34px] bg-white" />
-      <span className="block h-[2px] w-[34px] bg-white" />
-      <span className="block h-[2px] w-[34px] bg-white" />
+      <span className="block h-[2px] w-[34px]" style={{ backgroundColor: "#e11d48" }} />
+      <span className="block h-[2px] w-[34px]" style={{ backgroundColor: "#e11d48" }} />
+      <span className="block h-[2px] w-[34px]" style={{ backgroundColor: "#e11d48" }} />
     </button>
   );
 }
@@ -104,7 +104,7 @@ function Index() {
             color: "#ffffff",
           }}
         >
-          The Room <span style={{ color: "#e11d48" }}>Index</span>
+          The Room <span style={{ color: "#e11d48" }}>I</span>ndex
         </h1>
         <p
           className="text-white"
