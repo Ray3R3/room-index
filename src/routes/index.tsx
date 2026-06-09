@@ -73,7 +73,7 @@ function Index() {
         }}
       />
 
-      <MenuIcon />
+
 
       {/* Hero copy */}
       <div
