@@ -106,17 +106,17 @@ function Index() {
           Welcome to
         </p>
         <h1
+          className="text-white"
           style={{
             fontFamily: "'Cormorant Garamond', 'Playfair Display', serif",
             fontWeight: 400,
-            color: "#ff0000",
             fontSize: "clamp(56px, 9vw, 112px)",
             lineHeight: 1.05,
             letterSpacing: "0.005em",
             marginTop: "10px",
           }}
         >
-          The Room Index
+          The Room <span style={{ color: "#ff0000" }}>I</span>ndex
         </h1>
         <p
           className="text-white"
