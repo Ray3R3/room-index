@@ -146,7 +146,7 @@ export default function Countdown() {
           marginTop: "clamp(32px, 4vh, 48px)",
         }}
       >
-        A new way to find the perfect stay.
+        {"\n"}
       </p>
     </div>
   );
