@@ -2,6 +2,14 @@
 @source "../src";
 @import "tw-animate-css";
 
+@font-face {
+  font-family: "Qidea";
+  src: url("/__l5e/assets-v1/3ba60962-cdb6-4ce9-8f0f-b5e4ab17a46d/Qidea.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 /*
