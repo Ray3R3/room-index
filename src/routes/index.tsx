@@ -41,11 +41,6 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const SUGGESTIONS = [
-  "Best view in London",
-  "Best room in New York",
-  "Best bath in Paris",
-];
 
 function MenuIcon() {
   return (
