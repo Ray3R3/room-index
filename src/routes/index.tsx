@@ -93,18 +93,6 @@ function Index() {
         className="absolute left-1/2 z-20 w-full -translate-x-1/2 px-6 text-center"
         style={{ top: "22.5%" }}
       >
-        <p
-          className="text-white"
-          style={{
-            fontFamily: "'Poppins', sans-serif",
-            fontWeight: 300,
-            fontSize: "clamp(20px, 2.4vw, 32px)",
-            letterSpacing: "0.02em",
-            lineHeight: 1,
-          }}
-        >
-          Welcome to
-        </p>
         <h1
           className="text-white"
           style={{
