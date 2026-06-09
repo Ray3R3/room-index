@@ -42,19 +42,6 @@ export const Route = createFileRoute("/")({
 });
 
 
-function MenuIcon() {
-  return (
-    <button
-      aria-label="Open menu"
-      className="fixed z-30 flex flex-col p-1 transition-opacity hover:opacity-100"
-      style={{ top: "44px", left: "36px", gap: "7px", opacity: 0.85 }}
-    >
-      <span className="block h-[2px] w-[34px]" style={{ backgroundColor: "#e11d48" }} />
-      <span className="block h-[2px] w-[34px]" style={{ backgroundColor: "#e11d48" }} />
-      <span className="block h-[2px] w-[34px]" style={{ backgroundColor: "#e11d48" }} />
-    </button>
-  );
-}
 
 
 function Index() {
@@ -86,7 +73,7 @@ function Index() {
         }}
       />
 
-      <MenuIcon />
+
 
       {/* Hero copy */}
       <div
