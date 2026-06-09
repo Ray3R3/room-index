@@ -113,6 +113,7 @@ export default function Countdown() {
                     lineHeight: 1,
                     letterSpacing: "0.02em",
                     fontVariantNumeric: "tabular-nums",
+                    color: unit.label === "Days" ? "#e11d48" : undefined,
                   }}
                 >
                   {pad(unit.value)}
