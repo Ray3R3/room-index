@@ -245,18 +245,11 @@ function RoomPage() {
 
         {/* Map */}
         <section className="mt-12">
-          <div
-            className="overflow-hidden rounded-2xl"
-            style={{
-              border: "1px solid rgba(255,255,255,0.12)",
-              padding: "8px",
-              background: "rgba(8,14,22,0.4)",
-              maxWidth: "560px",
-            }}
-          >
-            <EditorialMap rooms={[room]} singlePin />
+          <div className="h-[360px] max-w-[640px]">
+            <GoogleMapPanel rooms={[room]} singlePin showRankBadges={false} />
           </div>
         </section>
+
 
         {/* Vote row */}
         <section className="mt-12">
