@@ -4,7 +4,7 @@ import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { toast } from "sonner";
 import CinematicBackdrop from "@/components/CinematicBackdrop";
-import EditorialMap from "@/components/EditorialMap";
+import GoogleMapPanel from "@/components/GoogleMapPanel";
 import IndexStatusBadge from "@/components/IndexStatusBadge";
 import { londonRooms, type Category } from "@/data/londonRooms";
 import {
@@ -42,6 +42,7 @@ function LondonPage() {
   const [active, setActive] = useState<Category | "all">(category ?? "all");
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [voted, setVoted] = useState<Record<string, boolean>>({});
+  const [mapOpen, setMapOpen] = useState(false);
 
   const lowerQ = (q ?? "").toLowerCase();
   const mentionsOtherCity = useMemo(() => {
@@ -144,7 +145,36 @@ function LondonPage() {
           </p>
         )}
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_minmax(340px,420px)]">
+        {/* Mobile map toggle */}
+        <div className="mb-4 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setMapOpen((o) => !o)}
+            className="rounded-full px-4 py-1.5"
+            style={{
+              background: mapOpen ? "#fff" : "rgba(255,255,255,0.05)",
+              color: mapOpen ? "#0a0f14" : "rgba(255,255,255,0.85)",
+              border: "1px solid rgba(255,255,255,0.22)",
+              fontFamily: "'Poppins',sans-serif",
+              fontSize: "11px",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+            }}
+          >
+            {mapOpen ? "Hide map" : "Show map"}
+          </button>
+          {mapOpen && (
+            <div className="mt-4 h-[60vh]">
+              <GoogleMapPanel
+                rooms={rooms}
+                highlightedId={hoverId}
+                onHover={setHoverId}
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_minmax(440px,44%)]">
           {/* Left: ranked list */}
           <ol className="flex flex-col gap-5">
             {rooms.map((r, i) => (
@@ -168,35 +198,16 @@ function LondonPage() {
 
           {/* Right: sticky map */}
           <aside className="hidden lg:block">
-            <div className="sticky top-24">
-              <div
-                className="overflow-hidden rounded-2xl"
-                style={{
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  background: "rgba(8,14,22,0.4)",
-                  padding: "8px",
-                }}
-              >
-                <EditorialMap
-                  rooms={rooms}
-                  highlightedId={hoverId}
-                  onHover={setHoverId}
-                />
-              </div>
-              <p
-                className="mt-3 text-center"
-                style={{
-                  fontSize: "11px",
-                  letterSpacing: "0.2em",
-                  textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.45)",
-                }}
-              >
-                Editorial map · Central London
-              </p>
+            <div className="sticky top-24 h-[calc(100vh-7rem)]">
+              <GoogleMapPanel
+                rooms={rooms}
+                highlightedId={hoverId}
+                onHover={setHoverId}
+              />
             </div>
           </aside>
         </div>
+
       </div>
     </CinematicBackdrop>
   );
