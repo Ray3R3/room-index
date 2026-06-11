@@ -228,17 +228,29 @@ export default function GoogleMapPanel({
       <div ref={divRef} className="absolute inset-0" />
 
       {error && (
-        <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-6 text-center">
           <p
             style={{
               fontFamily: "'Poppins',sans-serif",
               fontSize: "11px",
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "rgba(255,255,255,0.55)",
+              color: "rgba(255,255,255,0.65)",
             }}
           >
-            Map unavailable
+            {error}
+          </p>
+          <p
+            style={{
+              fontFamily: "'Poppins',sans-serif",
+              fontSize: "10px",
+              letterSpacing: "0.08em",
+              color: "rgba(255,255,255,0.4)",
+              maxWidth: "320px",
+              lineHeight: 1.5,
+            }}
+          >
+            Check Google Maps connector, Maps JavaScript API, billing, and referrer restrictions.
           </p>
         </div>
       )}
