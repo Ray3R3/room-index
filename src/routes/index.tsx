@@ -62,7 +62,7 @@ function Index() {
               color: "rgba(255,255,255,0.78)",
             }}
           >
-            The end of hotel search
+            LONDON INDEX LAUNCH
           </p>
         </section>
 
@@ -93,7 +93,7 @@ function Index() {
               marginBottom: "28px",
             }}
           >
-            LONDON INDEX LAUNCH
+            <br />
           </p>
           <Countdown />
         </section>
