@@ -1,58 +1,88 @@
-# Replace EditorialMap with GoogleMapPanel
+# /london — Full-height side map + scroll-sync
 
-Drop the hand-drawn SVG map and use Google Maps JS API as the base + pin layer, wrapped in the same dark/glass Room Index panel. Everything else in the MVP stays as-is.
+Scope: only `/london` and a small additive change to `GoogleMapPanel`. Nothing else changes.
 
-## Files
+## 1. Layout: fixed full-height map pane (desktop only)
 
-**New: `src/components/GoogleMapPanel.tsx**`
+In `src/routes/london.tsx`:
 
-- Props: `rooms: LondonRoom[]`, `highlightedId?: string | null`, `onHover?: (id: string | null) => void`, `singlePin?: boolean`, `showRankBadges?: boolean` (default true on list, false on detail).
-- Loads Maps JS API once via a module-level promise:
-  - URL: `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY}&loading=async&callback=__roomIndexInitMap${import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID` 
-      `? &channel=${import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID}` 
-      `: ''}`
-  - Resolves a singleton promise from the global callback. Subsequent panels reuse it.
-  - If the key env var is missing, render a graceful dark fallback panel ("Map unavailable — set Google Maps connector") instead of crashing.
-- Creates `new google.maps.Map(div, { center: { lat: 51.5074, lng: -0.1278 }, zoom: 13, disableDefaultUI: false, mapTypeControl: false, streetViewControl: false, fullscreenControl: false, zoomControl: true, clickableIcons: false, backgroundColor: '#0a0f14', styles: ROOM_INDEX_DARK_STYLE, gestureHandling: 'cooperative' })`. No `mapId`.
-- `ROOM_INDEX_DARK_STYLE`: dark desaturated style (deep navy water ~#0e1722, charcoal land ~#141b22, muted ivory labels at low opacity, hairline roads, POIs hidden, transit hidden). All Google brand colours suppressed.
-- Pins: `google.maps.Marker` with inline SVG `icon` (data URL or `path`):
-  - Inactive: 6px ivory-on-dark dot, 1px ring.
-  - Active (id === highlightedId, or `singlePin`): 11px muted red (#e11d48) dot with soft outer glow ring, white hairline border, slight z-index bump.
-  - When `showRankBadges` and rank ≤ 10: layered SVG icon with a small numbered label.
-- Hover: `mouseover`/`mouseout` on marker → `onHover(room.id | null)`. `click` → `onHover(room.id)` (selection sticks until next hover).
-- Tooltip: custom DOM `OverlayView` (not `InfoWindow`) anchored above the active pin, dark glass card with: neighbourhood eyebrow, hotel name (Qidea serif), room name (italic), composite score, and a `<Link to="/room/$id">View room</Link>`. Only one shown at a time, for `highlightedId` or `singlePin`.
-- Bounds: on mount and whenever `rooms` changes, build a `LatLngBounds` from visible rooms and `map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 })`. If only one room (`singlePin`), `setCenter` + `setZoom(15)` instead.
-- Internal chrome inside the panel: top-left badge "London / Index Map" (uppercase, tracked), bottom-right footer "Map · Central London", both as absolutely-positioned divs over the map.
-- Cleanup: clear markers on unmount and when `rooms` change; remove overlay.
+- Replace the current `lg:grid-cols-[1fr_minmax(440px,44%)]` grid with a single-column flow.
+- The page container keeps its current `mx-auto max-w-7xl px-6 ...` for the **left/content** column on mobile, but on `lg+` switch to a layout where:
+  - The outer page wrapper gets `lg:pr-[44vw]` so content never sits under the map.
+  - The `max-w-7xl` constraint is relaxed on `lg+` (use `lg:max-w-none` on the inner wrapper, keep an inner `lg:max-w-[860px]` on the content column so cards keep a comfortable measure).
+- Add a new sibling **outside** the content wrapper (still inside `CinematicBackdrop`):
+  ```tsx
+  <aside className="hidden lg:block fixed right-0 top-0 z-10 h-screen w-[44vw]">
+    <GoogleMapPanel rooms={rooms} highlightedId={activeId} onHover={setHoverId} />
+  </aside>
+  ```
+- `z-10` keeps it under `SiteMenu` (hamburger sits at a higher z in `__root.tsx`) — verify and bump only if needed.
+- Mobile/tablet (`<lg`): keep the existing "Show map" toggle and inline `h-[60vh]` panel exactly as today. Remove only the now-redundant desktop `<aside className="hidden lg:block">…sticky…</aside>` block.
 
-**Edit: `src/routes/london.tsx**`
+## 2. Map panel chrome adjustments
 
-- Replace `import EditorialMap` with `import GoogleMapPanel`.
-- Grid changes to `lg:grid-cols-[1fr_minmax(440px,44%)]` so the map takes ~40–45%.
-- Right column becomes sticky and tall: `sticky top-24 h-[calc(100vh-7rem)]`, panel fills full height. Inner map div: `h-full w-full rounded-2xl overflow-hidden`.
-- Filter/category state already filters the `rooms` list — pass the same filtered `rooms` to the map so only matching pins render and fitBounds reflows.
-- Mobile: hide the sticky panel, add a "Show map" toggle below the filter pills that reveals a `h-[60vh]` GoogleMapPanel above the list.
-- Drop the "Editorial map · Central London" caption (replaced by in-map footer).
+In `src/components/GoogleMapPanel.tsx`, add an optional `variant?: "card" | "pane"` prop (default `"card"`, used by `/room/$id` and the mobile toggle).
 
-**Edit: `src/routes/room.$id.tsx**`
+When `variant === "pane"`:
 
-- Replace `EditorialMap` with `<GoogleMapPanel rooms={[room]} singlePin showRankBadges={false} />`.
-- Keep the existing dark panel wrapper.
+- Outer wrapper: drop `rounded-2xl` and the left border becomes a hairline divider (`border-left: 1px solid rgba(255,255,255,0.1)`), other borders removed; full-bleed to screen edges.
+- Keep the "London / Index Map" top-left badge.
+- Soften the bottom-right "Map · Central London" footer (lower opacity / smaller) so it doesn't compete with map UI; keep it.
+- Tooltip card, pin styling, dark map style, fallback "Map unavailable" panel: **unchanged**.
 
-**Delete: `src/components/EditorialMap.tsx**` (no fallback retained).
+Pass `variant="pane"` from the fixed desktop aside. The mobile toggle uses default `"card"`.
+
+## 3. Scroll-sync (desktop only)
+
+State in `LondonPage`:
+
+- Keep `hoverId` for hover-driven highlight.
+- Add `scrollActiveId: string | null`.
+- Derived `activeId = hoverId ?? scrollActiveId` — hover wins over scroll, exactly as the spec asks.
+
+Implementation:
+
+- Wrap each room `<li>` in the `<ol>` with a ref registered into a `Map<string, HTMLLIElement>` (via a callback ref).
+- One `IntersectionObserver` per mount (recreated when `rooms` identity changes) with:
+  - `root: null` (viewport)
+  - `rootMargin: "-40% 0px -50% 0px"` so the "active band" is roughly the vertical centre of the viewport
+  - `threshold: 0`
+- On each callback: among currently-intersecting entries pick the one whose bounding rect centre is closest to viewport centre, then `setScrollActiveId(id)` only if changed.
+- Debounce updates with a small `requestAnimationFrame` + 80ms trailing timer to avoid jitter during fast scrolls.
+- Gate the whole observer behind a `matchMedia("(min-width: 1024px)")` check; on mobile/tablet do nothing and leave `scrollActiveId` null.
+- Clean up the observer and timers on unmount / when `rooms` changes.
+
+Map reaction:
+
+- Pass `highlightedId={activeId}` to `GoogleMapPanel` (already supported).
+- Add a new optional prop `panToHighlighted?: boolean` (default `false`, opt-in from `/london`).
+- In `GoogleMapPanel`, **separate effects**:
+  - Existing rooms/build-markers effect: still rebuilds markers, but only calls `fitBounds()` when `rooms` identity changes (i.e. category filter). Track previous `rooms` reference in a `ref` so re-renders from `highlightedId` changes don't re-fit.
+  - New effect keyed on `[highlightedId]` only: if `panToHighlighted` and a matching room exists, call `map.panTo({lat,lng})`. No `setZoom`, no `fitBounds`.
+- Keep `setZoom(15)` for `singlePin` mode (unchanged for `/room/$id`).
+
+Pin click behaviour:
+
+- `onHover(id)` on click stays as-is; this updates `hoverId` and so the active room. **No scroll** of the left list — matches "do not aggressively scroll".
+- Tooltip "View room" link unchanged.
+
+## 4. What stays exactly the same
+
+- `/`, countdown, hamburger menu, copy, data, room cards, voting, routing, `/room/$id`, pin SVGs, tooltip design, dark map style, fallback panel.
+- Mobile/tablet stacked layout + "Show map" toggle.
+- `GoogleMapPanel` default behaviour for `/room/$id` (`singlePin`, no `panToHighlighted`).
 
 ## Technical notes
 
-- Env vars used (browser-safe, per Google Maps connector knowledge):
-  - `VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY` — referrer-restricted browser key.
-  - `VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID` — appended as `channel` for usage tracking.
-- No Geocoding, Routes, Places, or server-side Maps calls — rooms already have `lat`/`lng`.
-- Use classic `google.maps.Marker` (not `AdvancedMarkerElement`) — no `mapId` required.
-- Loader pattern uses `loading=async` + a global `__roomIndexInitMap` callback to satisfy the async loading contract; the singleton promise prevents duplicate script tags across `/london` ↔ `/room/$id` navigations.
-- Custom map style applied via the `styles` option; this works without a cloud `mapId`.
-- The dark style + custom pins + custom OverlayView tooltip keep the surface visually consistent with the rest of the Room Index (no default Google InfoWindow chrome).
-- No new npm packages.
+- Files touched:
+  - `src/routes/london.tsx` — layout swap, scroll-sync hook, refs, `activeId` derivation.
+  - `src/components/GoogleMapPanel.tsx` — `variant` prop, `panToHighlighted` prop, split fit-bounds vs pan effects.
+- No new deps. No route changes. No data changes.
+- Guard against React render loops: `setScrollActiveId` only when the id actually changes; observer is created in a `useEffect` keyed on `[rooms]`.
+- SSR-safe: `IntersectionObserver` and `matchMedia` accessed only inside `useEffect`.
+- When scroll-sync first initialises, default `scrollActiveId` to the first visible/first ranked room after the rooms list loads, so the map has an active pin/tooltip before the user scrolls. After that, IntersectionObserver can take over.
+- z-index: the fixed map sits at `z-10`; `SiteMenu`/hamburger must remain above — will verify in `__root.tsx` and bump map down or menu up by one step if needed (no visual redesign).
 
 ## Out of scope
 
-No booking links, no Places autocomplete, no geocoding, no other cities, no persistence — strictly a visual/structural map swap.
+No new pages, no AdvancedMarkers/`mapId`, no booking changes, no map style redesign, no changes to room cards, vote flow, or `/room/$id`.
