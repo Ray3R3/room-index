@@ -48,7 +48,7 @@ export const Route = createFileRoute("/room/$id")({
 });
 
 function RoomPage() {
-  const { room } = Route.useLoaderData();
+  const { room } = Route.useLoaderData() as { room: import("@/data/londonRooms").LondonRoom };
   const [voted, setVoted] = useState<string | null>(null);
   const composite = compositeScore(room);
 
