@@ -112,28 +112,37 @@ export default function GoogleMapPanel({
 
   // Initial load
   useEffect(() => {
+    const hasKey = Boolean(import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY);
+    if (!hasKey) {
+      setError("Map unavailable — Google Maps browser key missing.");
+      return;
+    }
     const p = loadMaps();
     if (!p) {
-      setError("Map unavailable");
+      setError("Map unavailable — Google Maps browser key missing.");
       return;
     }
     let cancelled = false;
     p.then((g) => {
       if (cancelled || !divRef.current) return;
-      mapRef.current = new g.maps.Map(divRef.current, {
-        center: LONDON_CENTER,
-        zoom: 13,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false,
-        zoomControl: true,
-        clickableIcons: false,
-        backgroundColor: "#0a0f14",
-        styles: ROOM_INDEX_DARK_STYLE,
-        gestureHandling: "cooperative",
-      });
-      setReady(true);
-    }).catch(() => setError("Map unavailable"));
+      try {
+        mapRef.current = new g.maps.Map(divRef.current, {
+          center: LONDON_CENTER,
+          zoom: 13,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+          zoomControl: true,
+          clickableIcons: false,
+          backgroundColor: "#0a0f14",
+          styles: ROOM_INDEX_DARK_STYLE,
+          gestureHandling: "cooperative",
+        });
+        setReady(true);
+      } catch {
+        setError("Map unavailable — Google Maps failed to load.");
+      }
+    }).catch(() => setError("Map unavailable — Google Maps failed to load."));
     return () => {
       cancelled = true;
     };
