@@ -41,6 +41,7 @@ function LondonPage() {
   const { category, q } = Route.useSearch();
   const [active, setActive] = useState<Category | "all">(category ?? "all");
   const [hoverId, setHoverId] = useState<string | null>(null);
+  const [scrollActiveId, setScrollActiveId] = useState<string | null>(null);
   const [voted, setVoted] = useState<Record<string, boolean>>({});
   const [mapOpen, setMapOpen] = useState(false);
 
@@ -51,6 +52,69 @@ function LondonPage() {
   }, [lowerQ]);
 
   const rooms = useMemo(() => sortRooms(londonRooms, active), [active]);
+
+  const activeId = hoverId ?? scrollActiveId ?? rooms[0]?.id ?? null;
+
+  // Scroll-sync: observe room cards on desktop and pick the one nearest viewport centre
+  const cardRefs = useRef<Map<string, HTMLLIElement>>(new Map());
+  const setCardRef = (id: string) => (el: HTMLLIElement | null) => {
+    if (el) cardRefs.current.set(id, el);
+    else cardRefs.current.delete(id);
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(min-width: 1024px)").matches) return;
+
+    let raf = 0;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const visible = new Set<string>();
+
+    const pick = () => {
+      const centre = window.innerHeight / 2;
+      let bestId: string | null = null;
+      let bestDist = Infinity;
+      visible.forEach((id) => {
+        const el = cardRefs.current.get(id);
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const c = rect.top + rect.height / 2;
+        const d = Math.abs(c - centre);
+        if (d < bestDist) {
+          bestDist = d;
+          bestId = id;
+        }
+      });
+      if (bestId) {
+        setScrollActiveId((prev) => (prev === bestId ? prev : bestId));
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          const id = (e.target as HTMLElement).dataset.roomId;
+          if (!id) return;
+          if (e.isIntersecting) visible.add(id);
+          else visible.delete(id);
+        });
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(pick);
+        }, 80);
+      },
+      { root: null, rootMargin: "-40% 0px -50% 0px", threshold: 0 },
+    );
+
+    cardRefs.current.forEach((el) => observer.observe(el));
+
+    return () => {
+      observer.disconnect();
+      if (timer) clearTimeout(timer);
+      cancelAnimationFrame(raf);
+    };
+  }, [rooms]);
 
   return (
     <CinematicBackdrop>
