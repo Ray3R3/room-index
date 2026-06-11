@@ -126,6 +126,20 @@ export default function Countdown() {
       <p
         className="text-white"
         style={{
+          fontSize: "clamp(12px, 1.1vw, 16px)",
+          fontWeight: 300,
+          letterSpacing: "0.25em",
+          textTransform: "uppercase",
+          opacity: 0.75,
+          marginTop: "32px",
+        }}
+      >
+        Launching Soon
+      </p>
+
+      <p
+        className="text-white"
+        style={{
           fontSize: "clamp(13px, 1.2vw, 18px)",
           fontWeight: 300,
           letterSpacing: "0.06em",
