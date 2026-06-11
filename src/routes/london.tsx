@@ -4,7 +4,7 @@ import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { toast } from "sonner";
 import CinematicBackdrop from "@/components/CinematicBackdrop";
-import EditorialMap from "@/components/EditorialMap";
+import GoogleMapPanel from "@/components/GoogleMapPanel";
 import IndexStatusBadge from "@/components/IndexStatusBadge";
 import { londonRooms, type Category } from "@/data/londonRooms";
 import {
