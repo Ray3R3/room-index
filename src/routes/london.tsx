@@ -42,6 +42,7 @@ function LondonPage() {
   const [active, setActive] = useState<Category | "all">(category ?? "all");
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [voted, setVoted] = useState<Record<string, boolean>>({});
+  const [mapOpen, setMapOpen] = useState(false);
 
   const lowerQ = (q ?? "").toLowerCase();
   const mentionsOtherCity = useMemo(() => {
