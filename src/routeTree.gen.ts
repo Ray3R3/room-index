@@ -9,38 +9,128 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SubmitRouteImport } from './routes/submit'
+import { Route as LondonRouteImport } from './routes/london'
+import { Route as HomeRouteImport } from './routes/home'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RoomIdRouteImport } from './routes/room.$id'
+import { Route as VoteLondonCategoryRouteImport } from './routes/vote.london.$category'
 
+const SubmitRoute = SubmitRouteImport.update({
+  id: '/submit',
+  path: '/submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LondonRoute = LondonRouteImport.update({
+  id: '/london',
+  path: '/london',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RoomIdRoute = RoomIdRouteImport.update({
+  id: '/room/$id',
+  path: '/room/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VoteLondonCategoryRoute = VoteLondonCategoryRouteImport.update({
+  id: '/vote/london/$category',
+  path: '/vote/london/$category',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/home': typeof HomeRoute
+  '/london': typeof LondonRoute
+  '/submit': typeof SubmitRoute
+  '/room/$id': typeof RoomIdRoute
+  '/vote/london/$category': typeof VoteLondonCategoryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/home': typeof HomeRoute
+  '/london': typeof LondonRoute
+  '/submit': typeof SubmitRoute
+  '/room/$id': typeof RoomIdRoute
+  '/vote/london/$category': typeof VoteLondonCategoryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/home': typeof HomeRoute
+  '/london': typeof LondonRoute
+  '/submit': typeof SubmitRoute
+  '/room/$id': typeof RoomIdRoute
+  '/vote/london/$category': typeof VoteLondonCategoryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/home'
+    | '/london'
+    | '/submit'
+    | '/room/$id'
+    | '/vote/london/$category'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/home'
+    | '/london'
+    | '/submit'
+    | '/room/$id'
+    | '/vote/london/$category'
+  id:
+    | '__root__'
+    | '/'
+    | '/home'
+    | '/london'
+    | '/submit'
+    | '/room/$id'
+    | '/vote/london/$category'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HomeRoute: typeof HomeRoute
+  LondonRoute: typeof LondonRoute
+  SubmitRoute: typeof SubmitRoute
+  RoomIdRoute: typeof RoomIdRoute
+  VoteLondonCategoryRoute: typeof VoteLondonCategoryRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/submit': {
+      id: '/submit'
+      path: '/submit'
+      fullPath: '/submit'
+      preLoaderRoute: typeof SubmitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/london': {
+      id: '/london'
+      path: '/london'
+      fullPath: '/london'
+      preLoaderRoute: typeof LondonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +138,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/room/$id': {
+      id: '/room/$id'
+      path: '/room/$id'
+      fullPath: '/room/$id'
+      preLoaderRoute: typeof RoomIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vote/london/$category': {
+      id: '/vote/london/$category'
+      path: '/vote/london/$category'
+      fullPath: '/vote/london/$category'
+      preLoaderRoute: typeof VoteLondonCategoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HomeRoute: HomeRoute,
+  LondonRoute: LondonRoute,
+  SubmitRoute: SubmitRoute,
+  RoomIdRoute: RoomIdRoute,
+  VoteLondonCategoryRoute: VoteLondonCategoryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
