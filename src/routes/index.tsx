@@ -82,19 +82,6 @@ function Index() {
         </Link>
 
         <section className="mt-16 flex w-full max-w-[900px] flex-col items-center">
-          <p
-            className="mb-7"
-            style={{
-              fontFamily: "'Poppins',sans-serif",
-              fontWeight: 300,
-              fontSize: "clamp(12px, 1vw, 15px)",
-              letterSpacing: "0.26em",
-              textTransform: "uppercase",
-              color: "rgba(255,255,255,0.72)",
-            }}
-          >
-            Launching Soon
-          </p>
           <Countdown />
         </section>
       </main>
