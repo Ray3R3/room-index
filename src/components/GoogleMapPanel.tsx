@@ -50,6 +50,10 @@ function loadMaps(): Promise<typeof google> | null {
   if (window.__roomIndexMapsPromise) return window.__roomIndexMapsPromise;
 
   const key = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY;
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log(`Google Maps browser key present: ${Boolean(key)}`);
+  }
   if (!key) return null;
   const channel = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID;
 
@@ -57,11 +61,11 @@ function loadMaps(): Promise<typeof google> | null {
     window.__roomIndexInitMap = () => resolve(window.google!);
     const s = document.createElement("script");
     const params = new URLSearchParams({ key, loading: "async", callback: "__roomIndexInitMap" });
-    if (channel) params.set("channel", channel);
+    if (channel && channel.trim()) params.set("channel", channel);
     s.src = `https://maps.googleapis.com/maps/api/js?${params.toString()}`;
     s.async = true;
     s.defer = true;
-    s.onerror = () => reject(new Error("Failed to load Google Maps"));
+    s.onerror = () => reject(new Error("script-load-failed"));
     document.head.appendChild(s);
   });
   return window.__roomIndexMapsPromise;
