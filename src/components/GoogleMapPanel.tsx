@@ -1,3 +1,4 @@
+/// <reference types="google.maps" />
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import type { LondonRoom } from "@/data/londonRooms";
