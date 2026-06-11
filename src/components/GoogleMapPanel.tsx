@@ -50,6 +50,10 @@ function loadMaps(): Promise<typeof google> | null {
   if (window.__roomIndexMapsPromise) return window.__roomIndexMapsPromise;
 
   const key = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY;
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log(`Google Maps browser key present: ${Boolean(key)}`);
+  }
   if (!key) return null;
   const channel = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID;
 
@@ -57,11 +61,11 @@ function loadMaps(): Promise<typeof google> | null {
     window.__roomIndexInitMap = () => resolve(window.google!);
     const s = document.createElement("script");
     const params = new URLSearchParams({ key, loading: "async", callback: "__roomIndexInitMap" });
-    if (channel) params.set("channel", channel);
+    if (channel && channel.trim()) params.set("channel", channel);
     s.src = `https://maps.googleapis.com/maps/api/js?${params.toString()}`;
     s.async = true;
     s.defer = true;
-    s.onerror = () => reject(new Error("Failed to load Google Maps"));
+    s.onerror = () => reject(new Error("script-load-failed"));
     document.head.appendChild(s);
   });
   return window.__roomIndexMapsPromise;
@@ -108,28 +112,37 @@ export default function GoogleMapPanel({
 
   // Initial load
   useEffect(() => {
+    const hasKey = Boolean(import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY);
+    if (!hasKey) {
+      setError("Map unavailable — Google Maps browser key missing.");
+      return;
+    }
     const p = loadMaps();
     if (!p) {
-      setError("Map unavailable");
+      setError("Map unavailable — Google Maps browser key missing.");
       return;
     }
     let cancelled = false;
     p.then((g) => {
       if (cancelled || !divRef.current) return;
-      mapRef.current = new g.maps.Map(divRef.current, {
-        center: LONDON_CENTER,
-        zoom: 13,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false,
-        zoomControl: true,
-        clickableIcons: false,
-        backgroundColor: "#0a0f14",
-        styles: ROOM_INDEX_DARK_STYLE,
-        gestureHandling: "cooperative",
-      });
-      setReady(true);
-    }).catch(() => setError("Map unavailable"));
+      try {
+        mapRef.current = new g.maps.Map(divRef.current, {
+          center: LONDON_CENTER,
+          zoom: 13,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+          zoomControl: true,
+          clickableIcons: false,
+          backgroundColor: "#0a0f14",
+          styles: ROOM_INDEX_DARK_STYLE,
+          gestureHandling: "cooperative",
+        });
+        setReady(true);
+      } catch {
+        setError("Map unavailable — Google Maps failed to load.");
+      }
+    }).catch(() => setError("Map unavailable — Google Maps failed to load."));
     return () => {
       cancelled = true;
     };
@@ -215,17 +228,29 @@ export default function GoogleMapPanel({
       <div ref={divRef} className="absolute inset-0" />
 
       {error && (
-        <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-6 text-center">
           <p
             style={{
               fontFamily: "'Poppins',sans-serif",
               fontSize: "11px",
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "rgba(255,255,255,0.55)",
+              color: "rgba(255,255,255,0.65)",
             }}
           >
-            Map unavailable
+            {error}
+          </p>
+          <p
+            style={{
+              fontFamily: "'Poppins',sans-serif",
+              fontSize: "10px",
+              letterSpacing: "0.08em",
+              color: "rgba(255,255,255,0.4)",
+              maxWidth: "320px",
+              lineHeight: 1.5,
+            }}
+          >
+            Check Google Maps connector, Maps JavaScript API, billing, and referrer restrictions.
           </p>
         </div>
       )}
@@ -265,7 +290,7 @@ export default function GoogleMapPanel({
       </div>
 
       {/* Active tooltip card */}
-      {activeRoom && (
+      {ready && !error && activeRoom && (
         <div
           className="absolute left-1/2 top-3 z-10 w-[260px] -translate-x-1/2 rounded-xl p-4 text-white"
           style={{
