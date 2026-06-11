@@ -82,6 +82,19 @@ function Index() {
         </Link>
 
         <section className="mt-16 flex w-full max-w-[900px] flex-col items-center">
+          <p
+            style={{
+              fontFamily: "'Poppins',sans-serif",
+              fontWeight: 400,
+              fontSize: "clamp(12px, 1.2vw, 15px)",
+              letterSpacing: "0.26em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.72)",
+              marginBottom: "28px",
+            }}
+          >
+            LONDON INDEX LAUNCH
+          </p>
           <Countdown />
         </section>
       </main>
