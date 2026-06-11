@@ -38,35 +38,37 @@ function Index() {
   return (
     <CinematicBackdrop>
       <main className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col items-center justify-center px-6 py-24 text-center">
-        <h1
-          style={{
-            fontFamily: "'Qidea','Cormorant Garamond',serif",
-            fontWeight: 400,
-            fontSize: "clamp(48px, 8vw, 96px)",
-            lineHeight: 1.05,
-            letterSpacing: "0.005em",
-            color: "#fff",
-          }}
-        >
-          The Room <span style={{ color: "#e11d48" }}>Index</span>
-        </h1>
-        <p
-          style={{
-            fontFamily: "'Poppins',sans-serif",
-            fontWeight: 300,
-            fontSize: "clamp(13px, 1.4vw, 18px)",
-            letterSpacing: "0.22em",
-            textTransform: "uppercase",
-            marginTop: "18px",
-            color: "rgba(255,255,255,0.78)",
-          }}
-        >
-          The end of hotel search
-        </p>
+        <section className="flex flex-col items-center">
+          <h1
+            style={{
+              fontFamily: "'Qidea','Cormorant Garamond',serif",
+              fontWeight: 400,
+              fontSize: "clamp(56px, 8vw, 104px)",
+              lineHeight: 1.05,
+              letterSpacing: "0.005em",
+              color: "#fff",
+            }}
+          >
+            The Room <span style={{ color: "#e11d48" }}>Index</span>
+          </h1>
+          <p
+            style={{
+              fontFamily: "'Poppins',sans-serif",
+              fontWeight: 300,
+              fontSize: "clamp(13px, 1.4vw, 18px)",
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              marginTop: "22px",
+              color: "rgba(255,255,255,0.78)",
+            }}
+          >
+            The end of hotel search
+          </p>
+        </section>
 
         <Link
           to="/vote/london/view"
-          className="my-7 rounded-full px-8 py-2.5 text-white transition hover:opacity-90"
+          className="mt-14 rounded-full px-9 py-3 text-white transition hover:opacity-90"
           style={{
             background: "#e11d48",
             fontFamily: "'Poppins', sans-serif",
@@ -79,9 +81,22 @@ function Index() {
           Vote Now
         </Link>
 
-        <div className="w-full" style={{ maxWidth: "900px" }}>
+        <section className="mt-16 flex w-full max-w-[900px] flex-col items-center">
+          <p
+            className="mb-7"
+            style={{
+              fontFamily: "'Poppins',sans-serif",
+              fontWeight: 300,
+              fontSize: "clamp(12px, 1vw, 15px)",
+              letterSpacing: "0.26em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.72)",
+            }}
+          >
+            Launching Soon
+          </p>
           <Countdown />
-        </div>
+        </section>
       </main>
     </CinematicBackdrop>
   );
