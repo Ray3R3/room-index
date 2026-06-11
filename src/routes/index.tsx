@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import heroOcean from "@/assets/hero-ocean.png.asset.json";
 import Countdown from "@/components/Countdown";
 import CinematicBackdrop from "@/components/CinematicBackdrop";
