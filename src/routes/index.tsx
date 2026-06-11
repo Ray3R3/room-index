@@ -64,7 +64,22 @@ function Index() {
           The end of hotel search
         </p>
 
-        <div className="mt-[79px] w-full" style={{ maxWidth: "900px" }}>
+        <Link
+          to="/vote/london/view"
+          className="my-7 rounded-full px-8 py-2.5 text-white transition hover:opacity-90"
+          style={{
+            background: "#e11d48",
+            fontFamily: "'Poppins', sans-serif",
+            fontWeight: 500,
+            fontSize: "clamp(12px, 1.1vw, 15px)",
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+          }}
+        >
+          Vote Now
+        </Link>
+
+        <div className="w-full" style={{ maxWidth: "900px" }}>
           <Countdown />
         </div>
       </main>
