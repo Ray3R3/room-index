@@ -62,20 +62,6 @@ export default function Countdown() {
       className="flex flex-col items-center"
       style={{ fontFamily: "'Poppins', sans-serif" }}
     >
-      <p
-        className="text-white"
-        style={{
-          fontSize: "clamp(12px, 1.1vw, 16px)",
-          fontWeight: 300,
-          letterSpacing: "0.25em",
-          textTransform: "uppercase",
-          opacity: 0.75,
-          marginBottom: "32px",
-        }}
-      >
-        Launching Soon
-      </p>
-
       {isLive ? (
         <p
           className="text-white"
@@ -136,6 +122,20 @@ export default function Countdown() {
           ))}
         </div>
       )}
+
+      <p
+        className="text-white"
+        style={{
+          fontSize: "clamp(12px, 1.1vw, 16px)",
+          fontWeight: 300,
+          letterSpacing: "0.25em",
+          textTransform: "uppercase",
+          opacity: 0.75,
+          marginTop: "32px",
+        }}
+      >
+        Launching Soon
+      </p>
 
       <p
         className="text-white"
