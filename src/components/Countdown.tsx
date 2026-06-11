@@ -116,7 +116,7 @@ export default function Countdown() {
                     color: unit.label === "Days" ? "#e11d48" : undefined,
                   }}
                 >
-                  {pad(unit.value)}
+                  {unit.value === null ? "--" : pad(unit.value)}
                 </span>
               </div>
               <span
