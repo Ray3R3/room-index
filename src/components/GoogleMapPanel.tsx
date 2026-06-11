@@ -290,7 +290,7 @@ export default function GoogleMapPanel({
       </div>
 
       {/* Active tooltip card */}
-      {activeRoom && (
+      {ready && !error && activeRoom && (
         <div
           className="absolute left-1/2 top-3 z-10 w-[260px] -translate-x-1/2 rounded-xl p-4 text-white"
           style={{
