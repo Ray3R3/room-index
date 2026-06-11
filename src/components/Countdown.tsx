@@ -30,11 +30,10 @@ function pad(n: number) {
 }
 
 export default function Countdown() {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(() =>
-    getTimeLeft(LAUNCH_DATE)
-  );
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
   useEffect(() => {
+    setTimeLeft(getTimeLeft(LAUNCH_DATE));
     const interval = setInterval(() => {
       setTimeLeft(getTimeLeft(LAUNCH_DATE));
     }, 1000);
@@ -43,6 +42,7 @@ export default function Countdown() {
 
   const isLive = useMemo(
     () =>
+      timeLeft !== null &&
       timeLeft.days === 0 &&
       timeLeft.hours === 0 &&
       timeLeft.minutes === 0 &&
@@ -50,11 +50,11 @@ export default function Countdown() {
     [timeLeft]
   );
 
-  const units: { value: number; label: string }[] = [
-    { value: timeLeft.days, label: "Days" },
-    { value: timeLeft.hours, label: "Hours" },
-    { value: timeLeft.minutes, label: "Minutes" },
-    { value: timeLeft.seconds, label: "Seconds" },
+  const units: { value: number | null; label: string }[] = [
+    { value: timeLeft?.days ?? null, label: "Days" },
+    { value: timeLeft?.hours ?? null, label: "Hours" },
+    { value: timeLeft?.minutes ?? null, label: "Minutes" },
+    { value: timeLeft?.seconds ?? null, label: "Seconds" },
   ];
 
   return (
