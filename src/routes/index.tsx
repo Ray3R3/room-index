@@ -64,7 +64,7 @@ function Index() {
           The end of hotel search
         </p>
 
-        <div className="mt-16 w-full" style={{ maxWidth: "900px" }}>
+        <div className="w-full" style={{ marginTop: "69px", maxWidth: "900px" }}>
           <Countdown />
         </div>
       </main>
