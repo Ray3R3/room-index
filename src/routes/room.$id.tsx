@@ -3,7 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ChevronLeft } from "lucide-react";
 import CinematicBackdrop from "@/components/CinematicBackdrop";
-import EditorialMap from "@/components/EditorialMap";
+import GoogleMapPanel from "@/components/GoogleMapPanel";
 import IndexStatusBadge from "@/components/IndexStatusBadge";
 import { getRoomById } from "@/data/londonRooms";
 import { CATEGORIES, categoryLabel, compositeScore } from "@/data/categories";
