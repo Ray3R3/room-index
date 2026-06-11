@@ -118,7 +118,8 @@ function LondonPage() {
 
   return (
     <CinematicBackdrop>
-      <div className="mx-auto w-full max-w-7xl px-6 pb-24 pt-24">
+      <div className="w-full px-6 pb-24 pt-24 lg:pr-[calc(44vw+2rem)] lg:pl-10">
+        <div className="mx-auto w-full max-w-3xl lg:mx-0">
         <header className="mb-10 text-white">
           <p
             style={{
@@ -238,41 +239,40 @@ function LondonPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_minmax(440px,44%)]">
-          {/* Left: ranked list */}
-          <ol className="flex flex-col gap-5">
-            {rooms.map((r, i) => (
-              <li key={r.id}>
-                <RoomCard
-                  rank={i + 1}
-                  room={r}
-                  activeCategory={active}
-                  highlighted={hoverId === r.id}
-                  onHover={setHoverId}
-                  voted={!!voted[r.id]}
-                  onVote={() => {
-                    if (voted[r.id]) return;
-                    setVoted((v) => ({ ...v, [r.id]: true }));
-                    toast.success("Vote recorded for this session.");
-                  }}
-                />
-              </li>
-            ))}
-          </ol>
-
-          {/* Right: sticky map */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-24 h-[calc(100vh-7rem)]">
-              <GoogleMapPanel
-                rooms={rooms}
-                highlightedId={hoverId}
+        {/* Ranked list */}
+        <ol className="flex flex-col gap-5">
+          {rooms.map((r, i) => (
+            <li key={r.id} ref={setCardRef(r.id)} data-room-id={r.id}>
+              <RoomCard
+                rank={i + 1}
+                room={r}
+                activeCategory={active}
+                highlighted={activeId === r.id}
                 onHover={setHoverId}
+                voted={!!voted[r.id]}
+                onVote={() => {
+                  if (voted[r.id]) return;
+                  setVoted((v) => ({ ...v, [r.id]: true }));
+                  toast.success("Vote recorded for this session.");
+                }}
               />
-            </div>
-          </aside>
+            </li>
+          ))}
+        </ol>
         </div>
-
       </div>
+
+      {/* Desktop: fixed full-height side map pane */}
+      <aside className="pointer-events-auto fixed right-0 top-0 z-10 hidden h-screen w-[44vw] lg:block">
+        <GoogleMapPanel
+          rooms={rooms}
+          highlightedId={activeId}
+          onHover={setHoverId}
+          variant="pane"
+          panToHighlighted
+        />
+      </aside>
+
     </CinematicBackdrop>
   );
 }
