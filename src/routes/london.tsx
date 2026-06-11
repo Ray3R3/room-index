@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { toast } from "sonner";
@@ -41,6 +41,7 @@ function LondonPage() {
   const { category, q } = Route.useSearch();
   const [active, setActive] = useState<Category | "all">(category ?? "all");
   const [hoverId, setHoverId] = useState<string | null>(null);
+  const [scrollActiveId, setScrollActiveId] = useState<string | null>(null);
   const [voted, setVoted] = useState<Record<string, boolean>>({});
   const [mapOpen, setMapOpen] = useState(false);
 
@@ -52,9 +53,73 @@ function LondonPage() {
 
   const rooms = useMemo(() => sortRooms(londonRooms, active), [active]);
 
+  const activeId = hoverId ?? scrollActiveId ?? rooms[0]?.id ?? null;
+
+  // Scroll-sync: observe room cards on desktop and pick the one nearest viewport centre
+  const cardRefs = useRef<Map<string, HTMLLIElement>>(new Map());
+  const setCardRef = (id: string) => (el: HTMLLIElement | null) => {
+    if (el) cardRefs.current.set(id, el);
+    else cardRefs.current.delete(id);
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(min-width: 1024px)").matches) return;
+
+    let raf = 0;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const visible = new Set<string>();
+
+    const pick = () => {
+      const centre = window.innerHeight / 2;
+      let bestId: string | null = null;
+      let bestDist = Infinity;
+      visible.forEach((id) => {
+        const el = cardRefs.current.get(id);
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const c = rect.top + rect.height / 2;
+        const d = Math.abs(c - centre);
+        if (d < bestDist) {
+          bestDist = d;
+          bestId = id;
+        }
+      });
+      if (bestId) {
+        setScrollActiveId((prev) => (prev === bestId ? prev : bestId));
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          const id = (e.target as HTMLElement).dataset.roomId;
+          if (!id) return;
+          if (e.isIntersecting) visible.add(id);
+          else visible.delete(id);
+        });
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(pick);
+        }, 80);
+      },
+      { root: null, rootMargin: "-40% 0px -50% 0px", threshold: 0 },
+    );
+
+    cardRefs.current.forEach((el) => observer.observe(el));
+
+    return () => {
+      observer.disconnect();
+      if (timer) clearTimeout(timer);
+      cancelAnimationFrame(raf);
+    };
+  }, [rooms]);
+
   return (
     <CinematicBackdrop>
-      <div className="mx-auto w-full max-w-7xl px-6 pb-24 pt-24">
+      <div className="w-full px-6 pb-24 pt-24 lg:pr-[calc(44vw+2rem)] lg:pl-10">
+        <div className="mx-auto w-full max-w-3xl lg:mx-0">
         <header className="mb-10 text-white">
           <p
             style={{
@@ -174,41 +239,40 @@ function LondonPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_minmax(440px,44%)]">
-          {/* Left: ranked list */}
-          <ol className="flex flex-col gap-5">
-            {rooms.map((r, i) => (
-              <li key={r.id}>
-                <RoomCard
-                  rank={i + 1}
-                  room={r}
-                  activeCategory={active}
-                  highlighted={hoverId === r.id}
-                  onHover={setHoverId}
-                  voted={!!voted[r.id]}
-                  onVote={() => {
-                    if (voted[r.id]) return;
-                    setVoted((v) => ({ ...v, [r.id]: true }));
-                    toast.success("Vote recorded for this session.");
-                  }}
-                />
-              </li>
-            ))}
-          </ol>
-
-          {/* Right: sticky map */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-24 h-[calc(100vh-7rem)]">
-              <GoogleMapPanel
-                rooms={rooms}
-                highlightedId={hoverId}
+        {/* Ranked list */}
+        <ol className="flex flex-col gap-5">
+          {rooms.map((r, i) => (
+            <li key={r.id} ref={setCardRef(r.id)} data-room-id={r.id}>
+              <RoomCard
+                rank={i + 1}
+                room={r}
+                activeCategory={active}
+                highlighted={activeId === r.id}
                 onHover={setHoverId}
+                voted={!!voted[r.id]}
+                onVote={() => {
+                  if (voted[r.id]) return;
+                  setVoted((v) => ({ ...v, [r.id]: true }));
+                  toast.success("Vote recorded for this session.");
+                }}
               />
-            </div>
-          </aside>
+            </li>
+          ))}
+        </ol>
         </div>
-
       </div>
+
+      {/* Desktop: fixed full-height side map pane */}
+      <aside className="pointer-events-auto fixed right-0 top-0 z-10 hidden h-screen w-[44vw] lg:block">
+        <GoogleMapPanel
+          rooms={rooms}
+          highlightedId={activeId}
+          onHover={setHoverId}
+          variant="pane"
+          panToHighlighted
+        />
+      </aside>
+
     </CinematicBackdrop>
   );
 }

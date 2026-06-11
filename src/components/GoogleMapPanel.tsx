@@ -10,6 +10,8 @@ interface Props {
   onHover?: (id: string | null) => void;
   singlePin?: boolean;
   showRankBadges?: boolean;
+  variant?: "card" | "pane";
+  panToHighlighted?: boolean;
 }
 
 declare global {
@@ -92,13 +94,17 @@ export default function GoogleMapPanel({
   onHover,
   singlePin = false,
   showRankBadges = true,
+  variant = "card",
+  panToHighlighted = false,
 }: Props) {
   const divRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<Map<string, google.maps.Marker>>(new Map());
+  const prevRoomsRef = useRef<LondonRoom[] | null>(null);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const activeRoom = rooms.find((r) => r.id === highlightedId) ?? (singlePin ? rooms[0] : null);
+  const isPane = variant === "pane";
 
   // Initial load
   useEffect(() => {
@@ -129,11 +135,12 @@ export default function GoogleMapPanel({
     };
   }, []);
 
-  // Build/refresh markers + fit bounds
+  // Build/refresh markers + fit bounds only when the rooms set actually changes
   useEffect(() => {
     if (!ready || !mapRef.current || !window.google) return;
     const g = window.google;
     const map = mapRef.current;
+    const roomsChanged = prevRoomsRef.current !== rooms;
 
     markersRef.current.forEach((m) => m.setMap(null));
     markersRef.current.clear();
@@ -156,14 +163,17 @@ export default function GoogleMapPanel({
       markersRef.current.set(r.id, m);
     });
 
-    if (singlePin && rooms[0]) {
-      map.setCenter({ lat: rooms[0].lat, lng: rooms[0].lng });
-      map.setZoom(15);
-    } else if (rooms.length > 0) {
-      const bounds = new g.maps.LatLngBounds();
-      rooms.forEach((r) => bounds.extend({ lat: r.lat, lng: r.lng }));
-      map.fitBounds(bounds, 56);
-      if (rooms.length === 1) map.setZoom(15);
+    if (roomsChanged) {
+      if (singlePin && rooms[0]) {
+        map.setCenter({ lat: rooms[0].lat, lng: rooms[0].lng });
+        map.setZoom(15);
+      } else if (rooms.length > 0) {
+        const bounds = new g.maps.LatLngBounds();
+        rooms.forEach((r) => bounds.extend({ lat: r.lat, lng: r.lng }));
+        map.fitBounds(bounds, 56);
+        if (rooms.length === 1) map.setZoom(15);
+      }
+      prevRoomsRef.current = rooms;
     }
   }, [ready, rooms, singlePin, showRankBadges]);
 
@@ -179,13 +189,28 @@ export default function GoogleMapPanel({
     });
   }, [highlightedId, ready, rooms, singlePin]);
 
-  return (
-    <div
-      className="relative h-full w-full overflow-hidden rounded-2xl"
-      style={{
+  // Gently pan to highlighted room (opt-in via panToHighlighted)
+  useEffect(() => {
+    if (!ready || !panToHighlighted || !mapRef.current || !highlightedId) return;
+    const room = rooms.find((r) => r.id === highlightedId);
+    if (!room) return;
+    mapRef.current.panTo({ lat: room.lat, lng: room.lng });
+  }, [highlightedId, ready, panToHighlighted, rooms]);
+
+  const wrapperStyle: React.CSSProperties = isPane
+    ? {
+        borderLeft: "1px solid rgba(255,255,255,0.1)",
+        background: "rgba(8,14,22,0.6)",
+      }
+    : {
         border: "1px solid rgba(255,255,255,0.12)",
         background: "rgba(8,14,22,0.6)",
-      }}
+      };
+
+  return (
+    <div
+      className={`relative h-full w-full overflow-hidden ${isPane ? "" : "rounded-2xl"}`}
+      style={wrapperStyle}
     >
       <div ref={divRef} className="absolute inset-0" />
 
@@ -227,13 +252,13 @@ export default function GoogleMapPanel({
       <div
         className="pointer-events-none absolute bottom-3 right-3 rounded-full px-3 py-1"
         style={{
-          background: "rgba(8,14,22,0.72)",
-          border: "1px solid rgba(255,255,255,0.1)",
+          background: isPane ? "rgba(8,14,22,0.5)" : "rgba(8,14,22,0.72)",
+          border: `1px solid rgba(255,255,255,${isPane ? 0.06 : 0.1})`,
           fontFamily: "'Poppins',sans-serif",
-          fontSize: "9.5px",
+          fontSize: isPane ? "9px" : "9.5px",
           letterSpacing: "0.22em",
           textTransform: "uppercase",
-          color: "rgba(255,255,255,0.55)",
+          color: `rgba(255,255,255,${isPane ? 0.4 : 0.55})`,
         }}
       >
         Map · Central London
